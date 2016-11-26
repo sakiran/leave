@@ -11,7 +11,7 @@
     $fromdate  = mysqli_real_escape_string($dbconfig, $_POST['fromdate']);
     $todate  = mysqli_real_escape_string($dbconfig, $_POST['todate']);
     $reasonforleave  = mysqli_real_escape_string($dbconfig, $_POST['reasonforleave']);
-    $contactnumber  = mysqli_real_escape_string($dbconfig, $_POST['contactnumber']);
+    $contactnumber  = mysqli_real_escape_string($dbconfig, $_POST['phonenumber']);
     $approvalstatus = "pending with class incharge";
     $sql_query = "INSERT INTO leavemanagement (serialno,username, department, fromdate, todate,reason,contactnumber,approvalstatus) VALUES ('$serialno','$username', '$department', '$fromdate', '$todate', '$reasonforleave', '$contactnumber', '$approvalstatus')";
 

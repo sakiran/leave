@@ -9,8 +9,8 @@ $result    = mysqli_query($dbconfig, $sql_query);;
 
 
 if (mysqli_query($dbconfig, $sql_query)) {
-	header('Location: ../www/approveclassincharge.html');
-    echo "Record updated successfully";
+	#header('Location: ../www/approveclassincharge.html');
+    echo "success";
 } else {
     echo "Error updating record: " . mysqli_error($dbconfig);
 }

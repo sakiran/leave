@@ -24,3 +24,21 @@ var apply = {
         });
     }
 };
+
+//date plugin code
+$(document).ready(function() {
+            $('#fromdate').pickadate({
+                format: 'mm/dd/yyyy',
+                formatSubmit: 'mm/dd/yyyy',
+                hiddenName: true
+            });
+            $('#todate').pickadate({
+                format: 'mm/dd/yyyy',
+                formatSubmit: 'mm/dd/yyyy',
+                hiddenName: true
+            });
+
+
+
+
+        });
