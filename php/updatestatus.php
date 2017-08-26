@@ -1,5 +1,4 @@
 <?php
-header('Access-Control-Allow-Origin: *');
 include 'config.php';
 session_start();
 $status  = mysqli_real_escape_string($dbconfig, $_GET['status']);

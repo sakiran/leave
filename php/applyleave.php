@@ -1,5 +1,4 @@
 <?php 
-    header('Access-Control-Allow-Origin: *');
     include 'config.php';
     session_start();
     $username = $_SESSION["username"];

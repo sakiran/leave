@@ -1,5 +1,4 @@
 <?php
-header('Access-Control-Allow-Origin: *');
 include 'config.php';
 session_start();
 $sql_query = "SELECT * FROM leavemanagement";
