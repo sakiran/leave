@@ -1,0 +1,28 @@
+<?php
+header('Access-Control-Allow-Origin: *');
+$clusterEndpoint = "leave1.cln8oggr7sha.us-east-1.rds.amazonaws.com";
+$clusterPort = 3306;
+$clusterRegion = "us-east-1";
+$dbUsername = "kiran123";
+$dbDatabase = "leave1";
+
+// AWS-PHP-SDK installed via Zip File
+include(dirname(__FILE__) . "/vendor/aws-autoloader.php");
+#require 'aws-autoloader.php';
+
+
+use Aws\Credentials\CredentialProvider;
+
+
+$provider = CredentialProvider::defaultProvider();
+$RdsAuthGenerator = new Aws\Rds\AuthTokenGenerator($provider);
+
+$token = $RdsAuthGenerator->createToken($clusterEndpoint . ":" . $clusterPort, $clusterRegion, $dbUsername);
+
+$dbconfig = mysqli_init();
+
+mysqli_options(dbconfig, MYSQLI_READ_DEFAULT_FILE, "./my.cnf");
+
+$dbconfig->real_connect($clusterEndpoint, $dbUsername, $token, $dbDatabase, $clusterPort, NULL, MYSQLI_CLIENT_SSL);
+
+?>
