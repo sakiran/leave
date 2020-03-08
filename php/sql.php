@@ -1,9 +1,8 @@
 <?php
-/*
 
 $servername = "localhost";
-$username = "root";
-$password = "";
+$username = "admin";
+$password = "adminpassword";
 
 // Create connection
 $conn = mysqli_connect($servername, $username, $password);
@@ -23,14 +22,14 @@ if (mysqli_query($conn, $sql)) {
 
 mysqli_close($conn);
 
-*/
+
 ?>
 
 <?php
 $mysql_host = "localhost";
 $mysql_database = "dbleave";
-$mysql_user = "root";
-$mysql_password = "";
+$mysql_user = "admin";
+$mysql_password = "adminpassword";
 # MySQL with PDO_MYSQL
 $db = new PDO("mysql:host=$mysql_host;dbname=$mysql_database", $mysql_user, $mysql_password);
 
