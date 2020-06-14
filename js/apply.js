@@ -26,7 +26,7 @@ var apply = {
 };
 
 //date plugin code
-$(document).ready(function() {
+
             $('#fromdate').pickadate({
                 format: 'mm/dd/yyyy',
                 formatSubmit: 'mm/dd/yyyy',
@@ -37,11 +37,6 @@ $(document).ready(function() {
                 formatSubmit: 'mm/dd/yyyy',
                 hiddenName: true
             });
-
-
-
-
-        });
 
 $(document).on('click', '#submitbutton', function() {
 
