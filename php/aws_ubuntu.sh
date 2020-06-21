@@ -1,6 +1,6 @@
 sudo apt update -y
 #sudo apt upgrade -y
-sudo apt install -y apache2 
+sudo apt install -y apache2
 #systemctl status apache2
 sudo systemctl start apache2
 sudo systemctl enable apache2
@@ -11,7 +11,7 @@ sudo systemctl start mariadb
 sudo systemctl enable mariadb
 sudo mysql --user="root" --password="" --execute="GRANT ALL ON *.* TO 'admin'@'localhost' IDENTIFIED BY 'adminpassword' WITH GRANT OPTION;"
 sudo mysql --user="root" --password="" --execute="FLUSH PRIVILEGES;"
-#sudo apt install mysql-server -y 
+#sudo apt install mysql-server -y
 #sudo systemctl start mysql
 #sudo systemctl enable mysql
 #sudo apt install mysql-client-core-5.7 -y
@@ -28,7 +28,7 @@ sudo chmod -R 777 /var/www/html/
 curl http://localhost/leave/php/sql.php
 
 
-#install openjdk 8 
+#install openjdk 8
 
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 0xB1998361219BD9C9
 sudo apt-add-repository 'deb http://repos.azulsystems.com/ubuntu stable main'
@@ -36,7 +36,7 @@ sudo apt-get update
 sudo apt-get install zulu-8 -y
 
 
-#install sonarqube 
+#install sonarqube
 
 #create the sonarqube user:
 sudo adduser --system --no-create-home --group --disabled-login sonarqube
@@ -104,23 +104,22 @@ sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 
 
 
-sudo apt-get install libapache2-mod-security2 libapache2-mod-php7.2  -y
-sudo systemctl restart apache2
-apt-cache show libapache2-mod-security2
-sudo mv /etc/modsecurity/modsecurity.conf-recommended  /etc/modsecurity/modsecurity.conf
-git clone https://github.com/SpiderLabs/owasp-modsecurity-crs.git
-cd owasp-modsecurity-crs
-sudo mv crs-setup.conf.example /etc/modsecurity/crs-setup.conf
-sudo mv rules/ /etc/modsecurity/
-sudo cd /usr/share/modsecurity-crs 
-sudo mv crs-setup.conf.example crs-setup.conf
+#modsecurity firewall enable script
+sudo apt-get install libapache2-mod-security2 -y
+sudo service apache2 restart
+sudo apache2ctl -M | grep security
+sudo cp /etc/modsecurity/modsecurity.conf-recommended /etc/modsecurity/modsecurity.conf
+sudo sed -i 's/SecRuleEngine DetectionOnly/SecRuleEngine On/g' /etc/modsecurity/modsecurity.conf
+sudo service apache2 restart
+sudo mv /usr/share/modsecurity-crs /usr/share/modsecurity-crs.bk
+sudo git clone https://github.com/SpiderLabs/owasp-modsecurity-crs.git /usr/share/modsecurity-crs
+sudo cp /usr/share/modsecurity-crs/crs-setup.conf.example /usr/share/modsecurity-crs/crs-setup.conf
 sudo cat >/etc/apache2/mods-available/security2.conf<<- "EOF"
- <IfModule security2_module> 
-     SecDataDir /var/cache/modsecurity 
-     IncludeOptional /etc/modsecurity/*.conf 
-     IncludeOptional "/usr/share/modsecurity-crs/*.conf 
-     IncludeOptional "/usr/share/modsecurity-crs/rules/*.conf 
+ <IfModule security2_module>
+     SecDataDir /var/cache/modsecurity
+     IncludeOptional /etc/modsecurity/*.conf
+     IncludeOptional "/usr/share/modsecurity-crs/*.conf
+     IncludeOptional "/usr/share/modsecurity-crs/rules/*.conf
  </IfModule>
 EOF
 sudo systemctl restart apache2
-
