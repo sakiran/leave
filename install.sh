@@ -1,3 +1,4 @@
+#install apache,maria-db,php 
 sudo apt update -y
 #sudo apt upgrade -y
 sudo apt install -y apache2
@@ -20,39 +21,38 @@ sudo mysql --user="root" --password="" --execute="FLUSH PRIVILEGES;"
 sudo apt install php php-common php-mysql php-gd php-cli -y
 sudo systemctl restart apache2
 php --version
+#install leave web application 
 sudo apt install git -y
 git clone https://github.com/sakiran/leave.git
-
 sudo mv leave /var/www/html/
 sudo chmod -R 777 /var/www/html/
 curl http://localhost/leave/php/sql.php
-
-
-#install openjdk 8
-
+#install openjdk 11
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 0xB1998361219BD9C9
 sudo apt-add-repository 'deb http://repos.azulsystems.com/ubuntu stable main'
 sudo apt-get update
-sudo apt-get install zulu-8 -y
-
-
-#install sonarqube
-
-#create the sonarqube user:
+sudo apt-get install zulu-11 -y
+#install postgres
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo apt-get update
+sudo apt install postgresql postgresql-contrib -y
+sudo -u postgres createuser -s -i -d -r -l -w dbsonarqubeuser
+sudo -u postgres psql -c "ALTER ROLE dbsonarqubeuser WITH PASSWORD 'dbsonarqubeuserpassword';"
+sudo -u postgres psql -c 'create database dbsonarqube;'
+sudo -u postgres psql -c 'grant all privileges on database dbsonarqube to dbsonarqubeuser;'
+#install sonarqube7.9.3
 sudo adduser --system --no-create-home --group --disabled-login sonarqube
 sudo mkdir /opt/sonarqube
 sudo apt-get install unzip
-sudo mysql --user="root" --password="" --execute="GRANT ALL ON *.* TO 'sonarqube'@'localhost' IDENTIFIED BY 'sonarqubepassword' WITH GRANT OPTION;"
-sudo mysql --user="root" --password="" --execute="FLUSH PRIVILEGES;"
-sudo mysql --user="sonarqube" --password="sonarqubepassword" --execute="CREATE DATABASE sonarqube;";
 cd /opt/sonarqube
-sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-7.5.zip
-sudo unzip sonarqube-7.5.zip
-sudo rm sonarqube-7.5.zip
-sudo cat >/opt/sonarqube/sonarqube-7.5/conf/sonar.properties<<- "EOF"
-sonar.jdbc.username=sonarqube
-sonar.jdbc.password=sonarqubepassword
-sonar.jdbc.url=jdbc:mysql://localhost:3306/sonarqube?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance&useSSL=false
+sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-7.9.3.zip
+sudo unzip sonarqube-7.9.3.zip
+sudo rm sonarqube-7.9.3.zip
+sudo cat >/opt/sonarqube/sonarqube-7.9.3/conf/sonar.properties<<- "EOF"
+sonar.jdbc.username=dbsonarqubeuser
+sonar.jdbc.password=dbsonarqubeuserpassword
+sonar.jdbc.url=jdbc:postgresql://localhost:5432/dbsonarqube
 sonar.web.host=0.0.0.0
 sonar.web.port=9000
 EOF
@@ -61,49 +61,50 @@ sudo cat >/etc/systemd/system/sonarqube.service<<- "EOF"
 [Unit]
 Description=SonarQube service
 After=syslog.target network.target
-
 [Service]
+LimitMEMLOCK=infinity
+LimitNOFILE=65535
 Type=forking
-
-ExecStart=/opt/sonarqube/sonarqube-7.5/bin/linux-x86-64/sonar.sh start
-ExecStop=/opt/sonarqube/sonarqube-7.5/bin/linux-x86-64/sonar.sh stop
-
+ExecStart=/opt/sonarqube/sonarqube-7.9.3/bin/linux-x86-64/sonar.sh start
+ExecStop=/opt/sonarqube/sonarqube-7.9.3/bin/linux-x86-64/sonar.sh stop
 User=sonarqube
 Group=sonarqube
 Restart=always
-
 [Install]
 WantedBy=multi-user.target
-
 EOF
+
+sudo cat >>/etc/sysctl.conf<<- "EOF"
+vm.max_map_count=262144
+EOF
+
 sudo chown -R sonarqube:sonarqube /opt/sonarqube
 sudo service sonarqube start
 sudo systemctl enable sonarqube
 sudo mkdir /opt/sonarscanner
 cd /opt/sonarscanner
-sudo wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.2.0.1227-linux.zip
-sudo unzip sonar-scanner-cli-3.2.0.1227-linux.zip
-sudo rm sonar-scanner-cli-3.2.0.1227-linux.zip
-sudo cat >/opt/sonarscanner/sonar-scanner-3.2.0.1227-linux/conf/sonar-scanner.properties<<- "EOF"
+sudo wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.0.0.1744-linux.zip
+sudo unzip sonar-scanner-cli-4.0.0.1744-linux.zip
+sudo rm sonar-scanner-cli-4.0.0.1744-linux.zip
+sudo cat >/opt/sonarscanner/sonar-scanner-4.0.0.1744-linux/conf/sonar-scanner.properties<<- "EOF"
 sonar.host.url=http://localhost:9000
 sonar.sourceEncoding=UTF-8
 EOF
-sudo chmod +x /opt/sonarscanner/sonar-scanner-3.2.0.1227-linux/bin/sonar-scanner
+sudo chmod +x /opt/sonarscanner/sonar-scanner-4.0.0.1744-linux/bin/sonar-scanner
 sudo chmod -R 777 /opt/sonarscanner
-sudo ln -s /opt/sonarscanner/sonar-scanner-3.2.0.1227-linux/bin/sonar-scanner /usr/local/bin/sonar-scanner
-
-
+sudo ln -s /opt/sonarscanner/sonar-scanner-4.0.0.1744-linux/bin/sonar-scanner /usr/local/bin/sonar-scanner
+# sonarqube details  http://localhost:9000/ admin/admin 
+#install jenkins 
 cd ~
-wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
-sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
-sudo apt update
+wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -
+sudo sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > \
+    /etc/apt/sources.list.d/jenkins.list'
+sudo apt-get update
 sudo apt install jenkins -y
 sudo systemctl start jenkins
 sudo systemctl enable jenkins
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
-
-
-
+# jenkins details  http://localhost:8080/ 
 #modsecurity firewall enable script
 sudo apt-get install libapache2-mod-security2 -y
 sudo service apache2 restart
@@ -123,3 +124,6 @@ sudo cat >/etc/apache2/mods-available/security2.conf<<- "EOF"
  </IfModule>
 EOF
 sudo systemctl restart apache2
+#reboot ubuntu 
+sudo reboot
+
