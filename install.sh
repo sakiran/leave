@@ -1,4 +1,4 @@
-#install apache,maria-db,php 
+#install apache,maria-db,php
 sudo apt update -y
 #sudo apt upgrade -y
 sudo apt install -y apache2
@@ -21,7 +21,7 @@ sudo mysql --user="root" --password="" --execute="FLUSH PRIVILEGES;"
 sudo apt install php php-common php-mysql php-gd php-cli -y
 sudo systemctl restart apache2
 php --version
-#install leave web application 
+#install leave web application
 sudo apt install git -y
 git clone https://github.com/sakiran/leave.git
 sudo mv leave /var/www/html/
@@ -93,8 +93,8 @@ EOF
 sudo chmod +x /opt/sonarscanner/sonar-scanner-4.0.0.1744-linux/bin/sonar-scanner
 sudo chmod -R 777 /opt/sonarscanner
 sudo ln -s /opt/sonarscanner/sonar-scanner-4.0.0.1744-linux/bin/sonar-scanner /usr/local/bin/sonar-scanner
-# sonarqube details  http://localhost:9000/ admin/admin 
-#install jenkins 
+# sonarqube details  http://localhost:9000/ admin/admin
+#install jenkins
 cd ~
 wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -
 sudo sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > \
@@ -104,7 +104,7 @@ sudo apt install jenkins -y
 sudo systemctl start jenkins
 sudo systemctl enable jenkins
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
-# jenkins details  http://localhost:8080/ 
+# jenkins details  http://localhost:8080/
 #modsecurity firewall enable script
 sudo apt-get install libapache2-mod-security2 -y
 sudo service apache2 restart
@@ -124,6 +124,17 @@ sudo cat >/etc/apache2/mods-available/security2.conf<<- "EOF"
  </IfModule>
 EOF
 sudo systemctl restart apache2
-#reboot ubuntu 
-sudo reboot
 
+#install letsencrypt ssl certificate
+#https://certbot.eff.org/lets-encrypt/ubuntubionic-apache
+#sudo apt-get install software-properties-common -y
+#sudo add-apt-repository universe
+#sudo add-apt-repository ppa:certbot/certbot
+#sudo apt-get update -y
+#sudo apt-get install certbot python3-certbot-apache -y
+#sudo certbot --apache
+
+
+
+#reboot ubuntu
+sudo reboot
