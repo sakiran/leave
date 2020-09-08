@@ -125,6 +125,11 @@ sudo cat >/etc/apache2/mods-available/security2.conf<<- "EOF"
 EOF
 sudo systemctl restart apache2
 
+#run SonarQube on leave application
+#curl -u admin:admin http://localhost:9000/api/projects/create -d "project=leave&name=leave"
+#cd /var/www/html/leave
+#sonar-scanner -Dsonar.projectKey=leave   -Dsonar.sources=. -Dsonar.host.url=http://localhost:9000 -Dsonar.login=admin -Dsonar.password=admin
+
 #install letsencrypt ssl certificate
 #https://certbot.eff.org/lets-encrypt/ubuntubionic-apache
 #sudo apt-get install software-properties-common -y
