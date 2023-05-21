@@ -1,7 +1,7 @@
 <?php
 header('Access-Control-Allow-Origin: *');
-$host     = 'localhost';
-$username = 'admin';
+$host     = 'mariadb';
+$username = 'root';
 $password = 'adminpassword';
 $database = 'dbleave';
 $dbconfig = mysqli_connect($host, $username, $password, $database);

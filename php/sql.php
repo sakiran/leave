@@ -1,7 +1,7 @@
 <?php
 
-$servername = "localhost";
-$username = "admin";
+$servername = "mariadb";
+$username = "root";
 $password = "adminpassword";
 
 // Create connection
@@ -26,9 +26,9 @@ mysqli_close($conn);
 ?>
 
 <?php
-$mysql_host = "localhost";
+$mysql_host = "mariadb";
 $mysql_database = "dbleave";
-$mysql_user = "admin";
+$mysql_user = "root";
 $mysql_password = "adminpassword";
 # MySQL with PDO_MYSQL
 $db = new PDO("mysql:host=$mysql_host;dbname=$mysql_database", $mysql_user, $mysql_password);
